@@ -1,10 +1,10 @@
 module Api
   module V1
-    class ApplicationController < ActionController::Base
+    class ApplicationController < ActionController::API
       rescue_from StandardError do |error|
         case error
-        when ::ActiveRecord::RecordInvalid
-          render_error(error, :bad_request)
+        when ::ActiveRecord::RecordInvalid, TransferService::InsufficientBalanceError
+          render_error(error, :unprocessable_entity)
         when ::ActiveRecord::RecordNotFound
           render_error(error, :not_found)
         else

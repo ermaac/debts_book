@@ -1,5 +1,5 @@
 class Account < ApplicationRecord
-  DEFAULT_BALANCE = 100
+  DEFAULT_BALANCE = 1000
 
   belongs_to :user, required: true
 

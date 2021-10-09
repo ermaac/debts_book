@@ -24,6 +24,7 @@ module Api
           update_balances!
         rescue InsufficientBalanceError => e
           transfer_transaction.error = e.message
+          raise e
         ensure
           transfer_transaction.save!
         end
