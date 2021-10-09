@@ -1,7 +1,9 @@
 class Account < ApplicationRecord
   DEFAULT_BALANCE = 100
 
-  belongs_to :user
+  belongs_to :user, required: true
+
+  validates :balance, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   after_initialize :set_defaults, unless: :persisted?
 
