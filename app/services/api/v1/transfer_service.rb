@@ -1,24 +1,33 @@
 module Api
   module V1
     class TransferService
-      attr_reader :sender_email, :receiver_email, :transfer_amount,
+      class InsufficientBalanceError < StandardError;
+        def message
+          'Insufficient balance'
+        end
+      end
+
+      attr_reader :sender_account, :receiver_account, :transfer_amount,
                   :transfer_transaction
 
-      def initialize(sender_email, receiver_email, transfer_amount)
-        @sender_email = sender_email
-        @receiver_email = receiver_email
+      def initialize(sender_account, receiver_account, transfer_amount)
+        @sender_account = sender_account
+        @receiver_account = receiver_account
         @transfer_amount = transfer_amount
       end
 
       def transfer
         @transfer_transaction = build_transfer_transaction
         return unless transfer_transaction.valid?
-        TransactionTransfer.transaction(isolation: :repeatable_read) do
-          set_balances
-          sender_account.save!
-          receiver_account.save!
+
+        begin
+          update_balances!
+        rescue InsufficientBalanceError => e
+          transfer_transaction.error = e.message
+        ensure
           transfer_transaction.save!
         end
+        transfer_transaction
       end
 
       protected
@@ -31,24 +40,17 @@ module Api
         )
       end
 
-      def set_balances
-        if sender_account.sufficient_balance?(withdrawal_amount: transfer_amount)
-          sender_account.balance -= transfer_amount
-          receiver_account.balance += transfer_amount
-        else
-          transfer_transaction.error = 'Insufficient balance'
+      def update_balances!
+        ActiveRecord::Base.transaction(isolation: :repeatable_read) do
+          raise InsufficientBalanceError unless sender_account.sufficient_balance?(withdrawal_amount: transfer_amount)
+
+          sender_account.update!(balance:  sender_account.balance - transfer_amount)
+          receiver_account.update!(balance: receiver_account.balance + transfer_amount)
         end
+      rescue ActiveRecord::StatementInvalid => e
+        sleep(rand / 100)
+        retry
       end
-
-      def sender
-        @sender ||= UserService.new(sender_email).find_or_create_user
-      end
-      delegate :account, to: :sender, prefix: true
-
-      def receiver
-        @receiver ||= UserService.new(receiver_email).find_or_create_user
-      end
-      delegate :account, to: :receiver, prefix: true
     end
   end
 end

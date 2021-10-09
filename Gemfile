@@ -9,8 +9,9 @@ gem 'puma', '~> 5.0'
 gem 'webpacker', '~> 5.0'
 
 group :development, :test do
-  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  gem 'pry-byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'rspec-rails', '~> 5.0.0'
+  gem 'factory_bot_rails', '~> 6.2.0'
 end
 
 group :development do
