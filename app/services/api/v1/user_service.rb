@@ -23,7 +23,7 @@ module Api
       def create_user_with_account
         user = User.new(email: email)
         user.account = Account.new
-        user.save!
+        user.tap(&:save!)
       end
     end
   end

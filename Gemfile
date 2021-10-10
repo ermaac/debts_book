@@ -19,3 +19,6 @@ end
 group :development do
   gem 'listen', '~> 3.3'
 end
+
+gem "redis", "~> 4.4"
+gem "cable_ready", "~> 4.5"

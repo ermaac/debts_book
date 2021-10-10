@@ -1,6 +1,6 @@
 module Api
   module V1
-    class ApplicationController < ActionController::API
+    class ApplicationController < ActionController::Base
       rescue_from StandardError do |error|
         case error
         when ::ActiveRecord::RecordInvalid, TransferService::InsufficientBalanceError

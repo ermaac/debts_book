@@ -2,8 +2,10 @@
   "name": "debts-book",
   "private": true,
   "dependencies": {
+    "@rails/actioncable": "^6.1.4-1",
     "@rails/ujs": "^6.0.0",
     "@rails/webpacker": "5.4.3",
+    "cable_ready": "4.5.0",
     "webpack": "^4.46.0",
     "webpack-cli": "^3.3.12"
   },
