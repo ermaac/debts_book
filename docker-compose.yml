@@ -1,0 +1,60 @@
+version: "3"
+
+services:
+  web:
+    build:
+      context: .
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USERNAME: debts_book
+      DATABASE_PASSWORD: debts_book
+      WEBPACKER_DEV_SERVER_HOST: webpack
+      REDIS_URL: redis://redis:6379/1
+    command: bundle exec rails server -b 0.0.0.0
+    volumes:
+      - .:/opt/app
+      - /opt/app/node_modules
+    depends_on:
+      - db
+      - redis
+      - webpack
+    ports:
+      - 3000:3000
+
+  webpack:
+    build:
+      context: .
+    command: bash -c "rm -rf /opt/app/public/packs; /opt/app/bin/webpack-dev-server"
+    ports:
+      - 3035:3035
+    volumes:
+      - .:/opt/app
+      - /opt/app/node_modules
+    environment:
+      DATABASE_HOST: db
+      DATABASE_USERNAME: debts_book
+      DATABASE_PASSWORD: debts_book
+      NODE_ENV: development
+      RAILS_ENV: development
+      WEBPACKER_DEV_SERVER_HOST: 0.0.0.0
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:9.6
+    environment:
+      POSTGRES_USER: debts_book
+      POSTGRES_PASSWORD: debts_book
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  redis:
+    image: redis:5.0.7
+    ports:
+      - 6379:6379
+
+volumes:
+  db_data:

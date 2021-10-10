@@ -5,10 +5,11 @@ module Api
 
       skip_before_action :verify_authenticity_token
       before_action :initialize_accounts
-      after_action :broadcast_updates, only: :create
+      # after_action :broadcast_updates, only: :create
 
       def create
         TransferService.new(@sender_account, @receiver_account, params[:amount]).transfer
+        broadcast_updates
         render json: [@sender_account, @receiver_account]
       end
 

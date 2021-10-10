@@ -8,6 +8,8 @@ gem 'pg', '~> 1.1'
 gem 'puma', '~> 5.0'
 gem 'webpacker', '~> 5.0'
 gem 'slim-rails', '~> 3.3.0'
+gem "redis", "~> 4.4"
+gem "cable_ready", "~> 4.5"
 
 group :development, :test do
   gem 'pry-byebug', platforms: [:mri, :mingw, :x64_mingw]
@@ -19,6 +21,3 @@ end
 group :development do
   gem 'listen', '~> 3.3'
 end
-
-gem "redis", "~> 4.4"
-gem "cable_ready", "~> 4.5"
