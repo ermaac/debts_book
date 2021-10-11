@@ -8,10 +8,15 @@ module Api
       end
 
       def find_or_create_user!
-        user = find_user
-        return user if user.present?
+        ActiveRecord::Base.transaction do
+          user = find_user
+          return user if user.present?
 
-        create_user_with_account!
+          create_user_with_account!
+        end
+      rescue ActiveRecord::RecordNotUnique
+        sleep(rand/50)
+        retry
       end
 
       private

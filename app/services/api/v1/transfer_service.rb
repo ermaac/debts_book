@@ -42,15 +42,18 @@ module Api
       end
 
       def update_balances!
-        ActiveRecord::Base.transaction(isolation: :repeatable_read) do
+        ActiveRecord::Base.transaction do
           raise InsufficientBalanceError unless sender_account.sufficient_balance?(withdrawal_amount: transfer_amount)
 
-          sender_account.update!(balance:  sender_account.balance - transfer_amount)
-          receiver_account.update!(balance: receiver_account.balance + transfer_amount)
+          sender_account.reload.lock!('for update nowait').update!(balance:  sender_account.balance - transfer_amount)
+          receiver_account.reload.lock!('for update nowait').update!(balance: receiver_account.balance + transfer_amount)
         end
-      rescue ActiveRecord::StatementInvalid => e
-        sleep(rand / 100)
-        retry
+      rescue StandardError => e
+        unless e.is_a?(InsufficientBalanceError)
+          sleep(rand/50)
+          retry
+        else raise e
+        end
       end
     end
   end
