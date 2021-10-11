@@ -1,6 +1,4 @@
 class Account < ApplicationRecord
-  include CableReady::Broadcaster
-
   DEFAULT_BALANCE = 1000
 
   belongs_to :user, required: true
@@ -21,25 +19,6 @@ class Account < ApplicationRecord
   end
 
   def notify_observers
-    remove_outdated_accounts_from_dom
-    insert_updated_accounts_into_dom
-    cable_ready.broadcast
+    AccountsBroadcastObserver.new(self).notify
   end
-
-  def remove_outdated_accounts_from_dom
-    cable_ready['accounts'].remove(
-      selector: ".account[data-id=\"#{id}\"]",
-      select_all: true
-    )
-  end
-
-  def insert_updated_accounts_into_dom
-    cable_ready['accounts'].insert_adjacent_html(
-      selector: '#accounts',
-      position: 'afterbegin',
-      html: render(self)
-    )
-  end
-
-  delegate :render, to: :ApplicationController
 end
