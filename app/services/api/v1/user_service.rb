@@ -7,11 +7,11 @@ module Api
         @email = email
       end
 
-      def find_or_create_user
+      def find_or_create_user!
         user = find_user
         return user if user.present?
 
-        create_user_with_account
+        create_user_with_account!
       end
 
       private
@@ -20,7 +20,7 @@ module Api
         User.find_by(email: email)
       end
 
-      def create_user_with_account
+      def create_user_with_account!
         user = User.new(email: email)
         user.account = Account.new
         user.tap(&:save!)

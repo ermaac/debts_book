@@ -8,6 +8,8 @@ class BroadcastObserver
   end
 
   def notify
+    return if Rails.env.test?
+
     prepare_broadcast_updates
     broadcast
   end

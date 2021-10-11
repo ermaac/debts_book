@@ -13,7 +13,7 @@ module Api
       def initialize(sender_account, receiver_account, transfer_amount)
         @sender_account = sender_account
         @receiver_account = receiver_account
-        @transfer_amount = transfer_amount
+        @transfer_amount = transfer_amount&.to_i
       end
 
       def transfer
