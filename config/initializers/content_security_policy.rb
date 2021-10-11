@@ -12,7 +12,14 @@ Rails.application.config.content_security_policy do |policy|
   policy.script_src  :self, :https
   policy.style_src   :self, :https
   # If you are using webpack-dev-server then specify webpack-dev-server host
-  policy.connect_src :self, :https, "http://0.0.0.0:3000","ws://0.0.0.0:3000", "http://0.0.0.0:3035", "ws://0.0.0.0:3035" if Rails.env.development?
+  if Rails.env.development?
+    hosts = ['0.0.0.0', 'localhost']
+    ports = ['3000', '3035']
+    protocols = ['http', 'ws']
+    endpoints = protocols.product(hosts, ports).map { |protocol, host, port| "#{protocol}://#{host}:#{port}" }
+
+    policy.connect_src :self, :https, *endpoints
+  end
 
   # Specify URI for violation reports
   # policy.report_uri "/csp-violation-report-endpoint"
