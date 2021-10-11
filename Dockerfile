@@ -33,5 +33,3 @@ RUN bundle install
 COPY --chown=app:app . /opt/app
 
 ENTRYPOINT ["entrypoint.sh"]
-
-# CMD ["rails", "server", "-b", "0.0.0.0", "-p", "3000"]
