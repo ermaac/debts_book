@@ -18,7 +18,7 @@ module Api
 
       def transfer
         @transfer_transaction = build_transfer_transaction
-        return unless transfer_transaction.valid?
+        transfer_transaction.validate!
 
         begin
           update_balances!
