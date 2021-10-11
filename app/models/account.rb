@@ -12,6 +12,13 @@ class Account < ApplicationRecord
     balance >= withdrawal_amount
   end
 
+  def as_json(_)
+    {
+      email: user.email,
+      balance: balance
+    }
+  end
+
   private
 
   def set_defaults
