@@ -15,7 +15,6 @@ module Api
           create_user_with_account!
         end
       rescue ActiveRecord::RecordNotUnique
-        sleep(rand/50)
         retry
       end
 

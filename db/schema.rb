@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_10_11_214843) do
+ActiveRecord::Schema.define(version: 2021_10_20_172744) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 2021_10_11_214843) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["user_id"], name: "index_accounts_on_user_id"
+    t.check_constraint "balance >= (0)::numeric", name: "balance_sufficiency_check"
   end
 
   create_table "transfer_transactions", force: :cascade do |t|

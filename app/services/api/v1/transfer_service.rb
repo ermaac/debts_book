@@ -43,16 +43,16 @@ module Api
 
       def update_balances!
         ActiveRecord::Base.transaction do
-          raise InsufficientBalanceError unless sender_account.sufficient_balance?(withdrawal_amount: transfer_amount)
-
-          sender_account.reload.lock!('for update nowait').update!(balance:  sender_account.balance - transfer_amount)
-          receiver_account.reload.lock!('for update nowait').update!(balance: receiver_account.balance + transfer_amount)
+          [
+            { id: sender_account.id, action: -> { sender_account.decrement!(:balance, transfer_amount) } },
+            { id: receiver_account.id, action: -> { receiver_account.increment!(:balance, transfer_amount) } }
+          ].sort_by { |e| e[:id] }.each { |e| e[:action].call }
         end
-      rescue StandardError => e
-        unless e.is_a?(InsufficientBalanceError)
-          sleep(rand/50)
-          retry
-        else raise e
+      rescue ActiveRecord::StatementInvalid => e
+        if e.cause.is_a?(PG::CheckViolation) && e.message.match("balance_sufficiency_check")
+          raise InsufficientBalanceError.new
+        else
+          raise e
         end
       end
     end

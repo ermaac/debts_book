@@ -8,7 +8,7 @@ module Api
 
       def create
         TransferService.new(@sender_account, @receiver_account, params[:amount]).transfer
-        render json: [@sender_account, @receiver_account]
+        render json: [@sender_account, @receiver_account].map(&:reload)
       end
 
       private
