@@ -68,7 +68,7 @@ describe Api::V1::TransferService do
     context 'with valid params' do
       context 'when sender doesn\'t have sufficient balance' do
         let(:sender_balance) { valid_balance - 1 }
-        let(:error) { Api::V1::TransferService::InsufficientBalanceError }
+        let(:error) { Account::InsufficientBalanceError }
 
         it 'records TransferTransaction with error' do
           expect { transfer }.to raise_error(error)

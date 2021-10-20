@@ -9,6 +9,8 @@ module Api
       def create
         TransferService.new(@sender_account, @receiver_account, params[:amount]).transfer
         render json: [@sender_account, @receiver_account].map(&:reload)
+      rescue Account::InsufficientBalanceError => e
+        render_error(e, :unprocessable_entity)
       end
 
       private

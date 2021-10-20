@@ -1,12 +1,6 @@
 module Api
   module V1
     class TransferService
-      class InsufficientBalanceError < StandardError;
-        def message
-          'Insufficient balance'
-        end
-      end
-
       attr_reader :sender_account, :receiver_account, :transfer_amount,
                   :transfer_transaction
 
@@ -22,7 +16,7 @@ module Api
 
         begin
           update_balances!
-        rescue InsufficientBalanceError => e
+        rescue Account::InsufficientBalanceError => e
           transfer_transaction.error = e.message
           raise e
         ensure
@@ -44,15 +38,9 @@ module Api
       def update_balances!
         ActiveRecord::Base.transaction do
           [
-            { id: sender_account.id, action: -> { sender_account.decrement!(:balance, transfer_amount) } },
-            { id: receiver_account.id, action: -> { receiver_account.increment!(:balance, transfer_amount) } }
+            { id: sender_account.id, action: -> { sender_account.withdraw!(transfer_amount) } },
+            { id: receiver_account.id, action: -> { receiver_account.deposit!(transfer_amount) } }
           ].sort_by { |e| e[:id] }.each { |e| e[:action].call }
-        end
-      rescue ActiveRecord::StatementInvalid => e
-        if e.cause.is_a?(PG::CheckViolation) && e.message.match("balance_sufficiency_check")
-          raise InsufficientBalanceError.new
-        else
-          raise e
         end
       end
     end

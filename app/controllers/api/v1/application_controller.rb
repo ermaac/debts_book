@@ -3,7 +3,7 @@ module Api
     class ApplicationController < ActionController::Base
       rescue_from StandardError do |error|
         case error
-        when ::ActiveRecord::RecordInvalid, TransferService::InsufficientBalanceError
+        when ::ActiveRecord::RecordInvalid
           render_error(error, :unprocessable_entity)
         when ::ActiveRecord::RecordNotFound
           render_error(error, :not_found)
